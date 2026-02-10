@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { FileText, Upload, Trash2, Download, ArrowLeft, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { authenticatedFetch, isAuthenticated } from '@/lib/authClient';
 
 interface CVInfo {
   exists: boolean;
@@ -30,18 +31,20 @@ export default function CVManager() {
 
   useEffect(() => {
     // Check authentication
-    const adminData = sessionStorage.getItem('admin');
-    if (!adminData) {
+    if (!isAuthenticated()) {
       router.push('/admin/login');
-    } else {
-      setAdmin(JSON.parse(adminData));
-      fetchCVStatus();
+      return;
     }
+    const adminData = localStorage.getItem('admin_user');
+    if (adminData) {
+      setAdmin(JSON.parse(adminData));
+    }
+    fetchCVStatus();
   }, [router]);
 
   const fetchCVStatus = async () => {
     try {
-      const res = await fetch('/api/cv/status');
+      const res = await authenticatedFetch('/api/cv/status');
       const data = await res.json();
       if (data.success) {
         setCVInfo(data.data);
@@ -79,7 +82,7 @@ export default function CVManager() {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const res = await fetch('/api/cv/upload', {
+      const res = await authenticatedFetch('/api/cv/upload', {
         method: 'POST',
         body: formData,
       });
@@ -113,7 +116,7 @@ export default function CVManager() {
     setMessage(null);
 
     try {
-      const res = await fetch('/api/cv/delete', {
+      const res = await authenticatedFetch('/api/cv/delete', {
         method: 'DELETE',
       });
 

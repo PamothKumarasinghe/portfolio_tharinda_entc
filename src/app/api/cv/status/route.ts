@@ -2,9 +2,19 @@
 // GET /api/cv/status - Returns whether CV exists and metadata
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { requireAuth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication
+    const authCheck = await requireAuth(request);
+    if (!authCheck.authorized) {
+      return NextResponse.json(
+        { success: false, error: authCheck.error },
+        { status: 401 }
+      );
+    }
+
     // Connect to database
     const client = await clientPromise;
     const db = client.db('portfolio');

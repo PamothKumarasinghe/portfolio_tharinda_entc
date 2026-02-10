@@ -4,9 +4,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
 import clientPromise from '@/lib/mongodb';
 import { deleteFromGridFS } from '@/lib/gridfs';
+import { requireAuth } from '@/lib/auth';
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Require authentication
+    const authCheck = await requireAuth(request);
+    if (!authCheck.authorized) {
+      return NextResponse.json(
+        { success: false, error: authCheck.error },
+        { status: 401 }
+      );
+    }
+
     // Connect to database
     const client = await clientPromise;
     const db = client.db('portfolio');

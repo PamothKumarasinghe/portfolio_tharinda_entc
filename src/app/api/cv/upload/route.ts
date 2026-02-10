@@ -4,9 +4,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
 import clientPromise from '@/lib/mongodb';
 import { uploadToGridFS, deleteFromGridFS } from '@/lib/gridfs';
+import { requireAuth } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authCheck = await requireAuth(request);
+    if (!authCheck.authorized) {
+      return NextResponse.json(
+        { success: false, error: authCheck.error },
+        { status: 401 }
+      );
+    }
+
     // Get form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
