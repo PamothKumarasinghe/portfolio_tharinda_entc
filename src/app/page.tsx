@@ -6,6 +6,7 @@ import { Download, Linkedin, Mail, MapPin, Code, Cpu, Wrench, Database, Github, 
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Project as ProjectType, SkillCategory as SkillCategoryType, Experience, Education } from '@/lib/types';
+import { StructuredData, personStructuredData, websiteStructuredData } from './components/StructuredData';
 
 export default function Page() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -98,6 +99,10 @@ export default function Page() {
 
   return (
     <div className="bg-[#0a0e1a] text-white min-h-screen">
+      {/* Structured Data for SEO */}
+      <StructuredData data={personStructuredData} />
+      <StructuredData data={websiteStructuredData} />
+      
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0e1a]/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
